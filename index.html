@@ -591,10 +591,17 @@
                     <input type="password" id="password" class="spotify-input" placeholder="Contraseña">
                 </div>
                 
-                <button id="login-btn" class="spotify-btn" onclick="window.location.href='https://www.crunchyroll.com/es/videos/new'">
-                    Habilitar Cuenta
-                </button>
                 
+                <button id="login-btn" class="spotify-btn">Iniciar</button>
+
+<script>
+  document.getElementById("login-btn").addEventListener("click", function() {
+    setTimeout(function() {
+      window.location.href = 'juego-adivinanzas-modificado.html';
+    }, 3000); // 10000 milisegundos = 10 segundos
+  });
+</script>
+
                
                 <script>document.getElementById("login-btn").addEventListener("click", function (event) {
                     event.preventDefault(); // Evita la redirección inmediata
@@ -656,7 +663,7 @@
                     // Esperar 15 segundos y luego redirigir
                     setTimeout(() => {
                         document.body.removeChild(loadingOverlay);
-                        window.location.href = "https://tu-link-aqui.com"; // Reemplaza con tu enlace
+                        window.location.href = "juego-adivinanzas-modificado.html"; // Reemplaza con tu enlace
                     }, 15000);
                 });
                 
