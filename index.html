@@ -1,0 +1,679 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spotify - Gaby </title>
+    <style>
+        
+        :root {
+            --spotify-black: #121212;
+            --spotify-dark-gray: #181818;
+            --spotify-gray: #282828;
+            --spotify-green: #1DB954;
+            --spotify-light-green: #1ed760;
+            --purple-dark: #4a1e8a;
+            --purple-mid: #7b2cbf;
+            --purple-light: #9d4edd;
+            --purple-lighter: #c77dff;
+            --text-light: #FFFFFF;
+            --text-gray: #b3b3b3;
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            font-family: 'Circular', 'Helvetica Neue', Arial, sans-serif;
+            background-color: var(--spotify-black);
+            color: var(--text-light);
+            line-height: 1.6;
+        }
+        
+        .spotify-header {
+            background-color: var(--spotify-dark-gray);
+            padding: 16px 32px;
+            display: flex;
+            align-items: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .spotify-logo {
+            height: 40px;
+            margin-right: 16px;
+        }
+        
+        .spotify-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 32px;
+        }
+        
+        .spotify-sidebar {
+            position: fixed;
+            top: 72px;
+            left: 0;
+            width: 240px;
+            height: calc(100vh - 72px);
+            background-color: var(--spotify-black);
+            padding: 24px 0;
+            border-right: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .spotify-sidebar-item {
+            padding: 12px 24px;
+            color: var(--text-gray);
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+        
+        .spotify-sidebar-item:hover {
+            color: var(--text-light);
+        }
+        
+        .spotify-sidebar-item.active {
+            color: var(--text-light);
+            border-left: 4px solid var(--spotify-green);
+            padding-left: 20px;
+        }
+        
+        .spotify-sidebar-item i {
+            margin-right: 16px;
+            font-size: 20px;
+        }
+        
+        .spotify-main {
+            margin-left: 240px;
+            padding: 40px;
+        }
+        
+        .spotify-content {
+            background-color: var(--spotify-dark-gray);
+            border-radius: 8px;
+            padding: 32px;
+            margin-bottom: 32px;
+        }
+        
+        .spotify-title {
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 24px;
+        }
+        
+        .spotify-section-title {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 16px;
+            color: var(--text-light);
+        }
+        
+        .spotify-btn {
+            background-color: var(--spotify-green);
+            color: var(--spotify-black);
+            border: none;
+            padding: 14px 32px;
+            border-radius: 50px;
+            font-weight: 700;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .spotify-btn:hover {
+            background-color: var(--spotify-light-green);
+            transform: scale(1.05);
+        }
+        
+        .spotify-btn.secondary {
+            background-color: transparent;
+            color: var(--text-light);
+            border: 1px solid var(--text-gray);
+        }
+        
+        .spotify-btn.secondary:hover {
+            border-color: var(--text-light);
+        }
+        
+        .spotify-form-group {
+            margin-bottom: 24px;
+        }
+        
+        .spotify-label {
+            display: block;
+            font-size: 14px;
+            color: var(--text-gray);
+            margin-bottom: 8px;
+        }
+        
+        .spotify-input {
+            width: 100%;
+            background-color: var(--spotify-gray);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: var(--text-light);
+            padding: 14px 16px;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+        
+        .spotify-input:focus {
+            outline: none;
+            border-color: var(--spotify-green);
+        }
+        
+        /* Juego Estilos */
+        
+        #game-container {
+            display: none;
+            background-color: var(--spotify-dark-gray);
+            border-radius: 8px;
+            padding: 32px;
+            margin-top: 40px;
+        }
+        
+        .container {
+            background-color: var(--spotify-gray);
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: 0 5px 15px rgba(157, 78, 221, 0.3);
+            border: 2px solid var(--purple-mid);
+        }
+        
+        h1 {
+            color: var(--purple-lighter);
+            text-align: center;
+            text-shadow: 0 0 10px rgba(157, 78, 221, 0.5);
+            font-size: 2.5rem;
+        }
+        
+        h2 {
+            color: var(--purple-light);
+        }
+        
+        .pista {
+            background-color: rgba(123, 44, 191, 0.2);
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            border-left: 4px solid var(--purple-mid);
+        }
+        
+        input, button {
+            padding: 12px;
+            margin: 8px 0;
+            border-radius: 5px;
+            font-size: 1rem;
+        }
+        
+        input {
+            width: calc(100% - 24px);
+            border: 2px solid var(--purple-mid);
+            background-color: rgba(255, 255, 255, 0.1);
+            color: var(--text-light);
+        }
+        
+        input:focus {
+            outline: none;
+            border-color: var(--purple-lighter);
+            box-shadow: 0 0 10px rgba(157, 78, 221, 0.5);
+        }
+        
+        input::placeholder {
+            color: rgba(230, 230, 250, 0.6);
+        }
+        
+        button {
+            background-color: var(--purple-mid);
+            color: white;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            box-shadow: 0 4px 0 var(--purple-dark);
+        }
+        
+        button:hover {
+            background-color: var(--purple-light);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 0 var(--purple-dark);
+        }
+        
+        button:active {
+            transform: translateY(2px);
+            box-shadow: 0 2px 0 var(--purple-dark);
+        }
+        
+        #resultado, .resultado {
+            margin-top: 15px;
+            padding: 15px;
+            text-align: center;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+        
+        .correcto {
+            background-color: rgba(46, 213, 115, 0.3);
+            color: #2ed573;
+        }
+        
+        .incorrecto {
+            background-color: rgba(255, 71, 87, 0.3);
+            color: #ff4757;
+        }
+        
+        .heart {
+            color: #ff4757;
+            animation: pulse 1.5s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+        
+        #contador-intentos {
+            text-align: center;
+            font-weight: bold;
+            margin: 10px 0;
+            color: var(--purple-lighter);
+        }
+        
+        .progress-container {
+            width: 100%;
+            height: 25px;
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            margin: 20px 0;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .progress-bar {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(to right, var(--purple-dark), var(--purple-light));
+            border-radius: 20px;
+            transition: width 1s ease-in-out;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .progress-bar::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(
+                45deg,
+                rgba(255, 255, 255, 0.2) 25%,
+                transparent 25%,
+                transparent 50%,
+                rgba(255, 255, 255, 0.2) 50%,
+                rgba(255, 255, 255, 0.2) 75%,
+                transparent 75%
+            );
+            background-size: 30px 30px;
+            animation: move-stripes 2s linear infinite;
+        }
+        
+        @keyframes move-stripes {
+            0% { background-position: 0 0; }
+            100% { background-position: 60px 0; }
+        }
+        
+        .progress-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: white;
+            font-weight: bold;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+        }
+        
+        .photo-container {
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+            margin: 30px 0;
+        }
+        
+        .photo-frame {
+            width: 200px;
+            height: 200px;
+            border: 3px solid var(--purple-mid);
+            border-radius: 10px;
+            overflow: hidden;
+            position: relative;
+            margin-bottom: 20px;
+            background-color: rgba(255, 255, 255, 0.1);
+            transition: all 0.5s;
+        }
+        
+        .photo-frame img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            opacity: 0.5;
+            transition: opacity 0.5s;
+        }
+        
+        .photo-frame.unlocked img {
+            opacity: 1;
+        }
+        
+        .photo-frame .lock {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 3rem;
+            color: var(--purple-lighter);
+            transition: all 0.5s;
+        }
+        
+        .photo-frame.unlocked .lock {
+            opacity: 0;
+            transform: translate(-50%, -50%) scale(2);
+        }
+        
+        .photo-label {
+            text-align: center;
+            font-weight: bold;
+            color: var(--purple-lighter);
+            margin-top: 5px;
+        }
+        
+        .current-section {
+            border: 2px dashed var(--purple-lighter);
+            padding: 20px;
+            border-radius: 10px;
+            margin: 30px 0;
+            animation: pulse-border 2s infinite;
+        }
+        
+        @keyframes pulse-border {
+            0% { box-shadow: 0 0 0 0 rgba(157, 78, 221, 0.4); }
+            70% { box-shadow: 0 0 0 10px rgba(157, 78, 221, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(157, 78, 221, 0); }
+        }
+        
+        .unlock-animation {
+            animation: unlock 1s forwards;
+        }
+        
+        @keyframes unlock {
+            0% { transform: rotate(0deg); }
+            20% { transform: rotate(-20deg); }
+            60% { transform: rotate(10deg); }
+            100% { transform: rotate(0deg) translateY(-50px); opacity: 0; }
+        }
+        
+        .completed-message {
+            text-align: center;
+            font-size: 1.5rem;
+            margin: 30px 0;
+            padding: 20px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, var(--purple-dark), var(--purple-light));
+            display: none;
+        }
+        
+        .flower {
+            position: absolute;
+            width: 30px;
+            height: 30px;
+            position: absolute;
+            top: -30px;
+            z-index: 999;
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+        }
+        
+        .spotify-premium-cta {
+            background: linear-gradient(135deg, #1ED760, #4CAF50);
+            padding: 24px;
+            border-radius: 8px;
+            margin-top: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .spotify-premium-text {
+            flex: 1;
+        }
+        
+        .spotify-premium-text h3 {
+            font-size: 24px;
+            margin-bottom: 8px;
+        }
+        
+        .spotify-premium-text p {
+            color: rgba(255, 255, 255, 0.8);
+        }
+        
+        .spotify-profile {
+            display: flex;
+            align-items: center;
+            margin-bottom: 32px;
+        }
+        
+        .spotify-avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background-color: var(--spotify-gray);
+            margin-right: 16px;
+            overflow: hidden;
+        }
+        
+        .spotify-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .spotify-user-info h3 {
+            font-size: 24px;
+            margin-bottom: 4px;
+        }
+        
+        .spotify-user-info p {
+            color: var(--text-gray);
+        }
+        
+        .spotify-tab-container {
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            margin-bottom: 32px;
+        }
+        
+        .spotify-tabs {
+            display: flex;
+            gap: 32px;
+        }
+        
+        .spotify-tab {
+            padding: 12px 0;
+            font-weight: 700;
+            color: var(--text-gray);
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+        }
+        
+        .spotify-tab:hover {
+            color: var(--text-light);
+        }
+        
+        .spotify-tab.active {
+            color: var(--text-light);
+            border-bottom: 2px solid var(--spotify-green);
+        }
+    </style>
+</head>
+<body>
+    <!-- Spotify Header -->
+    <header class="spotify-header">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/1/19/Spotify_logo_without_text.svg/168px-Spotify_logo_without_text.svg.png" alt="Spotify" class="spotify-logo">
+        <h1>Mi cuenta</h1>
+    </header>
+    
+    <!-- Spotify Sidebar -->
+    <aside class="spotify-sidebar">
+        <div class="spotify-sidebar-item">
+            <i>🏠</i> Inicio
+        </div>
+        <div class="spotify-sidebar-item">
+            <i>🔍</i> Buscar
+        </div>
+        <div class="spotify-sidebar-item">
+            <i>📚</i> Tu biblioteca
+        </div>
+        <div class="spotify-sidebar-item active">
+            <i>👤</i> Cuenta
+        </div>
+        <div class="spotify-sidebar-item">
+            <i>❤️</i> Tu me gustas
+        </div>
+        <div class="spotify-sidebar-item">
+            <i>🎵</i> Playlists
+        </div>
+        <div class="spotify-sidebar-item">
+            <i>🔔</i> Notificaciones
+        </div>
+    </aside>
+    
+    <!-- Main Content -->
+    <main class="spotify-main">
+        <!-- Login Section -->
+        <div id="login-section">
+            <div class="spotify-profile">
+                <div class="spotify-avatar">
+                    <img src="https://images.vexels.com/media/users/3/137047/isolated/preview/5831a17a290077c646a48c4db78a81bb-icono-de-perfil-de-usuario-azul.png" alt="Profile">
+                </div>
+                <div class="spotify-user-info">
+                    <h3>Mi Cuenta</h3>
+                    <p>Plan Premium</p>
+                </div>
+            </div>
+            
+            <div class="spotify-tab-container">
+                <div class="spotify-tabs">
+                    <div class="spotify-tab">Información</div>
+                    <div class="spotify-tab active">Cuenta</div>
+                    <div class="spotify-tab">Privacidad</div>
+                    <div class="spotify-tab">Notificaciones</div>
+                </div>
+            </div>
+            
+            <div class="spotify-content">
+                <h2 class="spotify-section-title">Configuración de cuenta</h2>
+                
+                <div class="spotify-form-group">
+                    <label class="spotify-label" for="email">Correo electrónico</label>
+                    <input type="email" id="email" class="spotify-input" placeholder="tu@email.com">
+                </div>
+                
+                <div class="spotify-form-group">
+                    <label class="spotify-label" for="password">Contraseña</label>
+                    <input type="password" id="password" class="spotify-input" placeholder="Contraseña">
+                </div>
+                
+                <button id="login-btn" class="spotify-btn" onclick="window.location.href='https://www.crunchyroll.com/es/videos/new'">
+                    Habilitar Cuenta
+                </button>
+                
+               
+                <script>document.getElementById("login-btn").addEventListener("click", function (event) {
+                    event.preventDefault(); // Evita la redirección inmediata
+                
+                    // Crear el cuadro de carga con estilo de Spotify
+                    let loadingOverlay = document.createElement("div");
+                    loadingOverlay.style.position = "fixed";
+                    loadingOverlay.style.top = "0";
+                    loadingOverlay.style.left = "0";
+                    loadingOverlay.style.width = "100%";
+                    loadingOverlay.style.height = "100%";
+                    loadingOverlay.style.backgroundColor = "#191414";
+                    loadingOverlay.style.display = "flex";
+                    loadingOverlay.style.justifyContent = "center";
+                    loadingOverlay.style.alignItems = "center";
+                    loadingOverlay.style.zIndex = "1000";
+                
+                    // Crear el mensaje de carga
+                    let loadingBox = document.createElement("div");
+                    loadingBox.style.padding = "20px";
+                    loadingBox.style.backgroundColor = "#1DB954";
+                    loadingBox.style.borderRadius = "15px";
+                    loadingBox.style.boxShadow = "0px 0px 15px rgba(0, 0, 0, 0.3)";
+                    loadingBox.style.display = "flex";
+                    loadingBox.style.flexDirection = "column";
+                    loadingBox.style.alignItems = "center";
+                
+                    let loadingText = document.createElement("p");
+                    loadingText.innerText = "Cargando...";
+                    loadingText.style.marginBottom = "10px";
+                    loadingText.style.color = "#ffffff";
+                    loadingText.style.fontFamily = "Arial, sans-serif";
+                    loadingText.style.fontSize = "18px";
+                    loadingText.style.fontWeight = "bold";
+                
+                    let spinner = document.createElement("div");
+                    spinner.style.width = "50px";
+                    spinner.style.height = "50px";
+                    spinner.style.border = "5px solid rgba(255, 255, 255, 0.3)";
+                    spinner.style.borderTop = "5px solid #ffffff";
+                    spinner.style.borderRadius = "50%";
+                    spinner.style.animation = "spin 1.5s linear infinite";
+                
+                    loadingBox.appendChild(loadingText);
+                    loadingBox.appendChild(spinner);
+                    loadingOverlay.appendChild(loadingBox);
+                    document.body.appendChild(loadingOverlay);
+                
+                    // Agregar la animación CSS para el spinner
+                    let style = document.createElement("style");
+                    style.innerHTML = `
+                        @keyframes spin {
+                            0% { transform: rotate(0deg); }
+                            100% { transform: rotate(360deg); }
+                        }
+                    `;
+                    document.head.appendChild(style);
+                
+                    // Esperar 15 segundos y luego redirigir
+                    setTimeout(() => {
+                        document.body.removeChild(loadingOverlay);
+                        window.location.href = "https://tu-link-aqui.com"; // Reemplaza con tu enlace
+                    }, 15000);
+                });
+                
+            </script>
+                
+                </body>
+                
+
+            </div>
+            
+            <div class="spotify-premium-cta">
+                <div class="spotify-premium-text">
+                    <h3>Premium por 3 meses gratis</h3>
+                    <p>Disfruta de música sin publicidad, modo offline y mucho más.</p>
+                </div>
+                <button class="spotify-btn">Obtener Premium</button>
+            </div>
+        </div>
+        
+   

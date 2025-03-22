@@ -1,0 +1,737 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Juego de Adivinanzas</title>
+    <style>
+        :root {
+            --purple-dark: #4a1e8a;
+            --purple-mid: #7b2cbf;
+            --purple-light: #9d4edd;
+            --purple-lighter: #c77dff;
+            --dark-bg: #1a1a2e;
+            --dark-surface: #242447;
+            --text-light: #e6e6fa;
+        }
+        
+        body {
+            font-family: 'Arial', sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: var(--dark-bg);
+            color: var(--text-light);
+        }
+        
+        .container {
+            background-color: var(--dark-surface);
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: 0 5px 15px rgba(157, 78, 221, 0.3);
+            border: 2px solid var(--purple-mid);
+        }
+        
+        h1 {
+            color: var(--purple-lighter);
+            text-align: center;
+            text-shadow: 0 0 10px rgba(157, 78, 221, 0.5);
+            font-size: 2.5rem;
+        }
+        
+        h2 {
+            color: var(--purple-light);
+        }
+        
+        .pista {
+            background-color: rgba(123, 44, 191, 0.2);
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            border-left: 4px solid var(--purple-mid);
+        }
+        
+        input, button {
+            padding: 12px;
+            margin: 8px 0;
+            border-radius: 5px;
+            font-size: 1rem;
+        }
+        
+        input {
+            width: calc(100% - 24px);
+            border: 2px solid var(--purple-mid);
+            background-color: rgba(255, 255, 255, 0.1);
+            color: var(--text-light);
+        }
+        
+        input:focus {
+            outline: none;
+            border-color: var(--purple-lighter);
+            box-shadow: 0 0 10px rgba(157, 78, 221, 0.5);
+        }
+        
+        input::placeholder {
+            color: rgba(230, 230, 250, 0.6);
+        }
+        
+        button {
+            background-color: var(--purple-mid);
+            color: white;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            box-shadow: 0 4px 0 var(--purple-dark);
+        }
+        
+        button:hover {
+            background-color: var(--purple-light);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 0 var(--purple-dark);
+        }
+        
+        button:active {
+            transform: translateY(2px);
+            box-shadow: 0 2px 0 var(--purple-dark);
+        }
+        
+        #resultado {
+            margin-top: 15px;
+            padding: 15px;
+            text-align: center;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+        
+        .correcto {
+            background-color: rgba(46, 213, 115, 0.3);
+            color: #2ed573;
+        }
+        
+        .incorrecto {
+            background-color: rgba(255, 71, 87, 0.3);
+            color: #ff4757;
+        }
+        
+        .heart {
+            color: #ff4757;
+            animation: pulse 1.5s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+        
+        #contador-intentos {
+            text-align: center;
+            font-weight: bold;
+            margin: 10px 0;
+            color: var(--purple-lighter);
+        }
+        
+        .flor {
+            position: absolute;
+            font-size: 20px;
+            position: absolute;
+            top: -25px;
+            z-index: 999;
+            user-select: none;
+            pointer-events: none;
+        }
+        
+        .progress-container {
+            width: 100%;
+            height: 25px;
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            margin: 20px 0;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .progress-bar {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(to right, var(--purple-dark), var(--purple-light));
+            border-radius: 20px;
+            transition: width 1s ease-in-out;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .progress-bar::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(
+                45deg,
+                rgba(255, 255, 255, 0.2) 25%,
+                transparent 25%,
+                transparent 50%,
+                rgba(255, 255, 255, 0.2) 50%,
+                rgba(255, 255, 255, 0.2) 75%,
+                transparent 75%
+            );
+            background-size: 30px 30px;
+            animation: move-stripes 2s linear infinite;
+        }
+        
+        @keyframes move-stripes {
+            0% { background-position: 0 0; }
+            100% { background-position: 60px 0; }
+        }
+        
+        .progress-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: white;
+            font-weight: bold;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+        }
+        
+        .photo-container {
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+            margin: 30px 0;
+        }
+        
+        .photo-frame {
+            width: 200px;
+            height: 200px;
+            border: 3px solid var(--purple-mid);
+            border-radius: 10px;
+            overflow: hidden;
+            position: relative;
+            margin-bottom: 20px;
+            background-color: rgba(255, 255, 255, 0.1);
+            transition: all 0.5s;
+        }
+        
+        .photo-frame img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            opacity: 0.5;
+            transition: opacity 0.5s;
+        }
+        
+        .photo-frame.unlocked img {
+            opacity: 1;
+        }
+        
+        .photo-frame .lock {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 3rem;
+            color: var(--purple-lighter);
+            transition: all 0.5s;
+        }
+        
+        .photo-frame.unlocked .lock {
+            opacity: 0;
+            transform: translate(-50%, -50%) scale(2);
+        }
+        
+        .photo-label {
+            text-align: center;
+            font-weight: bold;
+            color: var(--purple-lighter);
+            margin-top: 5px;
+        }
+        
+        .current-section {
+            border: 2px dashed var(--purple-lighter);
+            padding: 20px;
+            border-radius: 10px;
+            margin: 30px 0;
+            animation: pulse-border 2s infinite;
+        }
+        
+        @keyframes pulse-border {
+            0% { box-shadow: 0 0 0 0 rgba(157, 78, 221, 0.4); }
+            70% { box-shadow: 0 0 0 10px rgba(157, 78, 221, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(157, 78, 221, 0); }
+        }
+        
+        .unlock-animation {
+            animation: unlock 1s forwards;
+        }
+        
+        @keyframes unlock {
+            0% { transform: rotate(0deg); }
+            20% { transform: rotate(-20deg); }
+            60% { transform: rotate(10deg); }
+            100% { transform: rotate(0deg) translateY(-50px); opacity: 0; }
+        }
+        
+        .completed-message {
+            text-align: center;
+            font-size: 1.5rem;
+            margin: 30px 0;
+            padding: 20px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, var(--purple-dark), var(--purple-light));
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Juego de Adivinanzas <span class="heart">❤️</span></h1>
+        
+        <div class="progress-container">
+            <div class="progress-bar" id="progress-bar"></div>
+            <div class="progress-text">0/3 Completado</div>
+        </div>
+        
+        <div class="photo-container">
+            <div>
+                <div class="photo-frame" id="photo-frame-1">
+                    <img id="photo-1" src="/api/placeholder/200/200" alt="Foto 1">
+                    <div class="lock">🔒</div>
+                </div>
+                <div class="photo-label">Recuerdo 1</div>
+            </div>
+            
+            <div>
+                <div class="photo-frame" id="photo-frame-2">
+                    <img id="photo-2" src="/api/placeholder/200/200" alt="Foto 2">
+                    <div class="lock">🔒</div>
+                </div>
+                <div class="photo-label">Recuerdo 2</div>
+            </div>
+            
+            <div>
+                <div class="photo-frame" id="photo-frame-3">
+                    <img id="photo-3" src="/api/placeholder/200/200" alt="Foto 3">
+                    <div class="lock">🔒</div>
+                </div>
+                <div class="photo-label">Recuerdo 3</div>
+            </div>
+        </div>
+        
+        <div id="game-section" class="game-section">
+            <div id="section-1" class="current-section">
+                <h2>Desafío 1 de 3</h2>
+                <div id="pistas-1"></div>
+                <button id="mostrar-pista-1" class="mostrar-pista">Mostrar siguiente pista</button>
+                <div class="attempt-section">
+                    <input type="text" id="intento-1" placeholder="Escribe tu respuesta" class="intento">
+                    <button id="comprobar-1" class="comprobar">Comprobar</button>
+                </div>
+                <div id="resultado-1" class="resultado"></div>
+            </div>
+            
+            <div id="section-2" style="display: none;">
+                <h2>Desafío 2 de 3</h2>
+                <div id="pistas-2"></div>
+                <button id="mostrar-pista-2" class="mostrar-pista">Mostrar siguiente pista</button>
+                <div class="attempt-section">
+                    <input type="text" id="intento-2" placeholder="Escribe tu respuesta" class="intento">
+                    <button id="comprobar-2" class="comprobar">Comprobar</button>
+                </div>
+                <div id="resultado-2" class="resultado"></div>
+            </div>
+            
+            <div id="section-3" style="display: none;">
+                <h2>Desafío 3 de 3</h2>
+                <div id="pistas-3"></div>
+                <button id="mostrar-pista-3" class="mostrar-pista">Mostrar siguiente pista</button>
+                <div class="attempt-section">
+                    <input type="text" id="intento-3" placeholder="Escribe tu respuesta" class="intento">
+                    <button id="comprobar-3" class="comprobar">Comprobar</button>
+                </div>
+                <div id="resultado-3" class="resultado"></div>
+            </div>
+        </div>
+        
+        <div id="completed-message" class="completed-message">
+            <h2>¡Felicidades! Has completado todos los desafíos 🎉</h2>
+            <p>Serás redirigida a una sorpresa en 5 segundos...</p>
+        </div>
+    </div>
+
+    <script>
+        // CONFIGURA TUS PALABRAS SECRETAS Y PISTAS AQUÍ
+        // =============================================
+        
+        // Primera palabra a adivinar
+        const palabra1 = "amor";
+        const pistas1 = [
+            "Es lo que siento cuando te miro",
+            "Tiene 4 letras",
+            "Comienza con A",
+            "Es lo más bonito que compartimos juntos"
+        ];
+        
+        // Segunda palabra a adivinar
+        const palabra2 = "beso";
+        const pistas2 = [
+            "Es algo que nos gusta compartir",
+            "Tiene 4 letras",
+            "Comienza con B",
+            "Es dulce y adictivo"
+        ];
+        
+        // Tercera palabra a adivinar
+        const palabra3 = "juntos";
+        const pistas3 = [
+            "Es como quiero estar contigo siempre",
+            "Tiene 6 letras",
+            "Comienza con J",
+            "Es como estamos cuando nos abrazamos"
+        ];
+        
+        // URLs de las imágenes (remplaza con las URLs de tus fotos)
+        const urlFoto1 = "/api/placeholder/200/200"; // Reemplaza con tu URL
+        const urlFoto2 = "/api/placeholder/200/200"; // Reemplaza con tu URL
+        const urlFoto3 = "/api/placeholder/200/200"; // Reemplaza con tu URL
+        
+        // URL de redirección final
+        const urlRedireccionFinal = "https://ejemplo.com/sorpresa-final"; // Cambia esta URL
+        // =============================================
+        
+        // Variables del juego
+        let indicePista1 = 0;
+        let indicePista2 = 0;
+        let indicePista3 = 0;
+        let intentosTotal = 0;
+        let desafiosCompletados = 0;
+        
+        // Configuración de imágenes
+        document.getElementById('photo-1').src = urlFoto1;
+        document.getElementById('photo-2').src = urlFoto2;
+        document.getElementById('photo-3').src = urlFoto3;
+        
+        // Función para mostrar pista para el desafío 1
+        function mostrarPista1() {
+            if (indicePista1 < pistas1.length) {
+                const pistaElement = document.createElement('div');
+                pistaElement.className = 'pista';
+                pistaElement.innerHTML = `<strong>Pista ${indicePista1 + 1}:</strong> ${pistas1[indicePista1]}`;
+                document.getElementById('pistas-1').appendChild(pistaElement);
+                
+                // Efecto de aparición
+                pistaElement.style.opacity = '0';
+                pistaElement.style.transform = 'translateY(20px)';
+                pistaElement.style.transition = 'opacity 0.5s, transform 0.5s';
+                
+                setTimeout(() => {
+                    pistaElement.style.opacity = '1';
+                    pistaElement.style.transform = 'translateY(0)';
+                }, 10);
+                
+                indicePista1++;
+                
+                // Si ya se mostraron todas las pistas, ocultar botón
+                if (indicePista1 >= pistas1.length) {
+                    document.getElementById('mostrar-pista-1').style.display = 'none';
+                }
+            }
+        }
+        
+        // Función para mostrar pista para el desafío 2
+        function mostrarPista2() {
+            if (indicePista2 < pistas2.length) {
+                const pistaElement = document.createElement('div');
+                pistaElement.className = 'pista';
+                pistaElement.innerHTML = `<strong>Pista ${indicePista2 + 1}:</strong> ${pistas2[indicePista2]}`;
+                document.getElementById('pistas-2').appendChild(pistaElement);
+                
+                // Efecto de aparición
+                pistaElement.style.opacity = '0';
+                pistaElement.style.transform = 'translateY(20px)';
+                pistaElement.style.transition = 'opacity 0.5s, transform 0.5s';
+                
+                setTimeout(() => {
+                    pistaElement.style.opacity = '1';
+                    pistaElement.style.transform = 'translateY(0)';
+                }, 10);
+                
+                indicePista2++;
+                
+                // Si ya se mostraron todas las pistas, ocultar botón
+                if (indicePista2 >= pistas2.length) {
+                    document.getElementById('mostrar-pista-2').style.display = 'none';
+                }
+            }
+        }
+        
+        // Función para mostrar pista para el desafío 3
+        function mostrarPista3() {
+            if (indicePista3 < pistas3.length) {
+                const pistaElement = document.createElement('div');
+                pistaElement.className = 'pista';
+                pistaElement.innerHTML = `<strong>Pista ${indicePista3 + 1}:</strong> ${pistas3[indicePista3]}`;
+                document.getElementById('pistas-3').appendChild(pistaElement);
+                
+                // Efecto de aparición
+                pistaElement.style.opacity = '0';
+                pistaElement.style.transform = 'translateY(20px)';
+                pistaElement.style.transition = 'opacity 0.5s, transform 0.5s';
+                
+                setTimeout(() => {
+                    pistaElement.style.opacity = '1';
+                    pistaElement.style.transform = 'translateY(0)';
+                }, 10);
+                
+                indicePista3++;
+                
+                // Si ya se mostraron todas las pistas, ocultar botón
+                if (indicePista3 >= pistas3.length) {
+                    document.getElementById('mostrar-pista-3').style.display = 'none';
+                }
+            }
+        }
+        
+        // Función para comprobar respuesta del desafío 1
+        function comprobarRespuesta1() {
+            const intento = document.getElementById('intento-1').value.trim().toLowerCase();
+            intentosTotal++;
+            
+            if (intento === palabra1.toLowerCase()) {
+                // Desbloqueo exitoso
+                document.getElementById('resultado-1').className = 'resultado correcto';
+                document.getElementById('resultado-1').innerHTML = '¡Correcto! ¡Has desbloqueado el primer recuerdo!';
+                
+                // Animar el desbloqueo del candado
+                const lock = document.querySelector('#photo-frame-1 .lock');
+                lock.innerHTML = '🔓';
+                lock.classList.add('unlock-animation');
+                
+                // Desbloquear la foto
+                setTimeout(() => {
+                    document.getElementById('photo-frame-1').classList.add('unlocked');
+                }, 1000);
+                
+                // Actualizar progreso
+                desafiosCompletados++;
+                actualizarProgreso();
+                
+                // Pasar al siguiente desafío
+                setTimeout(() => {
+                    document.getElementById('section-1').style.display = 'none';
+                    document.getElementById('section-2').style.display = 'block';
+                    document.getElementById('section-2').classList.add('current-section');
+                    mostrarPista2(); // Mostrar primera pista del segundo desafío
+                }, 2000);
+            } else {
+                document.getElementById('resultado-1').className = 'resultado incorrecto';
+                document.getElementById('resultado-1').textContent = 'Respuesta incorrecta. ¡Intenta de nuevo!';
+                document.getElementById('intento-1').value = '';
+                
+                // Efecto de vibración
+                const inputElement = document.getElementById('intento-1');
+                inputElement.style.animation = 'shake 0.5s';
+                setTimeout(() => {
+                    inputElement.style.animation = '';
+                }, 500);
+            }
+        }
+        
+        // Función para comprobar respuesta del desafío 2
+        function comprobarRespuesta2() {
+            const intento = document.getElementById('intento-2').value.trim().toLowerCase();
+            intentosTotal++;
+            
+            if (intento === palabra2.toLowerCase()) {
+                // Desbloqueo exitoso
+                document.getElementById('resultado-2').className = 'resultado correcto';
+                document.getElementById('resultado-2').innerHTML = '¡Correcto! ¡Has desbloqueado el segundo recuerdo!';
+                
+                // Animar el desbloqueo del candado
+                const lock = document.querySelector('#photo-frame-2 .lock');
+                lock.innerHTML = '🔓';
+                lock.classList.add('unlock-animation');
+                
+                // Desbloquear la foto
+                setTimeout(() => {
+                    document.getElementById('photo-frame-2').classList.add('unlocked');
+                }, 1000);
+                
+                // Actualizar progreso
+                desafiosCompletados++;
+                actualizarProgreso();
+                
+                // Pasar al siguiente desafío
+                setTimeout(() => {
+                    document.getElementById('section-2').style.display = 'none';
+                    document.getElementById('section-3').style.display = 'block';
+                    document.getElementById('section-3').classList.add('current-section');
+                    mostrarPista3(); // Mostrar primera pista del tercer desafío
+                }, 2000);
+            } else {
+                document.getElementById('resultado-2').className = 'resultado incorrecto';
+                document.getElementById('resultado-2').textContent = 'Respuesta incorrecta. ¡Intenta de nuevo!';
+                document.getElementById('intento-2').value = '';
+                
+                // Efecto de vibración
+                const inputElement = document.getElementById('intento-2');
+                inputElement.style.animation = 'shake 0.5s';
+                setTimeout(() => {
+                    inputElement.style.animation = '';
+                }, 500);
+            }
+        }
+        
+        // Función para comprobar respuesta del desafío 3
+        function comprobarRespuesta3() {
+            const intento = document.getElementById('intento-3').value.trim().toLowerCase();
+            intentosTotal++;
+            
+            if (intento === palabra3.toLowerCase()) {
+                // Desbloqueo exitoso
+                document.getElementById('resultado-3').className = 'resultado correcto';
+                document.getElementById('resultado-3').innerHTML = '¡Correcto! ¡Has desbloqueado el tercer recuerdo!';
+                
+                // Animar el desbloqueo del candado
+                const lock = document.querySelector('#photo-frame-3 .lock');
+                lock.innerHTML = '🔓';
+                lock.classList.add('unlock-animation');
+                
+                // Desbloquear la foto
+                setTimeout(() => {
+                    document.getElementById('photo-frame-3').classList.add('unlocked');
+                }, 1000);
+                
+                // Actualizar progreso
+                desafiosCompletados++;
+                actualizarProgreso();
+                
+                // Mostrar mensaje de finalización
+                setTimeout(() => {
+                    document.getElementById('section-3').style.display = 'none';
+                    document.getElementById('completed-message').style.display = 'block';
+                    crearFloresAmarillas();
+                    
+                    // Redireccionar después de 5 segundos
+                    setTimeout(() => {
+                        window.location.href = urlRedireccionFinal;
+                    }, 5000);
+                }, 2000);
+            } else {
+                document.getElementById('resultado-3').className = 'resultado incorrecto';
+                document.getElementById('resultado-3').textContent = 'Respuesta incorrecta. ¡Intenta de nuevo!';
+                document.getElementById('intento-3').value = '';
+                
+                // Efecto de vibración
+                const inputElement = document.getElementById('intento-3');
+                inputElement.style.animation = 'shake 0.5s';
+                setTimeout(() => {
+                    inputElement.style.animation = '';
+                }, 500);
+            }
+        }
+        
+        // Función para actualizar la barra de progreso
+        function actualizarProgreso() {
+            const porcentaje = (desafiosCompletados / 3) * 100;
+            document.getElementById('progress-bar').style.width = porcentaje + '%';
+            document.querySelector('.progress-text').textContent = `${desafiosCompletados}/3 Completado`;
+        }
+        
+        // Función para crear efecto de flores amarillas
+        function crearFloresAmarillas() {
+            // Símbolos de flores
+            const floresEmojis = ['🌻', '💛', '🌼', '⭐', '🌟', '✨'];
+            const numFlores = 200;
+            
+            for (let i = 0; i < numFlores; i++) {
+                const flor = document.createElement('div');
+                flor.className = 'flor';
+                
+                // Seleccionar un emoji de flor aleatoriamente
+                const emojiIndex = Math.floor(Math.random() * floresEmojis.length);
+                flor.innerHTML = floresEmojis[emojiIndex];
+                
+                // Tamaño aleatorio para las flores
+                const tamano = Math.random() * 24 + 16;
+                flor.style.fontSize = `${tamano}px`;
+                
+                // Posicionar la flor en un lugar aleatorio
+                flor.style.left = Math.random() * 100 + 'vw';
+                
+                // Color amarillo para los emojis que no son naturalmente amarillos
+                if (emojiIndex > 2) {
+                    flor.style.color = '#FFD700';
+                }
+                
+                // Rotación aleatoria
+                flor.style.transform = `rotate(${Math.random() * 360}deg)`;
+                
+                document.body.appendChild(flor);
+                
+                // Animación de caída con giro
+                const animation = flor.animate(
+                    [
+                        { 
+                            transform: `translateY(0) rotate(${Math.random() * 360}deg)`, 
+                            opacity: 1 
+                        },
+                        { 
+                            transform: `translateY(${window.innerHeight}px) rotate(${Math.random() * 720}deg)`, 
+                            opacity: 0.7 
+                        }
+                    ],
+                    {
+                        duration: Math.random() * 5000 + 3000,
+                        easing: 'cubic-bezier(0.1, 0.8, 0.3, 1)'
+                    }
+                );
+                
+                animation.onfinish = () => flor.remove();
+            }
+        }
+        
+        // Efecto de vibración
+        document.head.insertAdjacentHTML('beforeend', `
+            <style>
+                @keyframes shake {
+                    0%, 100% { transform: translateX(0); }
+                    20%, 60% { transform: translateX(-5px); }
+                    40%, 80% { transform: translateX(5px); }
+                }
+            </style>
+        `);
+        
+        // Eventos para botones y Enter
+        document.getElementById('mostrar-pista-1').addEventListener('click', mostrarPista1);
+        document.getElementById('mostrar-pista-2').addEventListener('click', mostrarPista2);
+        document.getElementById('mostrar-pista-3').addEventListener('click', mostrarPista3);
+        
+        document.getElementById('comprobar-1').addEventListener('click', comprobarRespuesta1);
+        document.getElementById('comprobar-2').addEventListener('click', comprobarRespuesta2);
+        document.getElementById('comprobar-3').addEventListener('click', comprobarRespuesta3);
+        
+        document.getElementById('intento-1').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') comprobarRespuesta1();
+        });
+        
+        document.getElementById('intento-2').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') comprobarRespuesta2();
+        });
+        
+        document.getElementById('intento-3').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') comprobarRespuesta3();
+        });
+        
+        // Mostrar primera pista automáticamente al cargar
+        window.addEventListener('load', () => {
+            setTimeout(mostrarPista1, 500);
+        });
+    </script>
+</body>
+</html>
